@@ -34,7 +34,9 @@ This approach allows for an exceptionally high HIT RATIO, making the cache parti
 ### Requirements
 Node.js and express, axios, url, body-parser. Varnish Cache 3.0 or Higher. A Linux OS support systemd.
 
-### Configuring Ghost to Use Web API Hooks
+## Configuring Ghost to Use Web API Hooks
+![image](https://github.com/MarcoMarcoaldi/Vernice.js/assets/113010551/875103a9-d14a-4bea-99b1-53109d4a2fc7)
+
 To properly integrate Ghost with the VERNICE.JS middleware and enable selective cache purging for Varnish, you need to configure Ghost to use Hooks via Web API. Below are the detailed steps to perform this configuration starting from the provided image.
 
 Access the Ghost admin panel and go to Settings.
@@ -54,7 +56,9 @@ Repeat the process to add additional webhooks that cover all events of interest,
 
 ![image](https://github.com/MarcoMarcoaldi/Vernice.js/assets/113010551/bd2b4abf-c09d-4fc4-867a-190c2ad090c7)
 
-### Keeping the Service Active with a Systemd Unit
+## Keeping the Service Active with a Systemd Unit
+![image](https://github.com/MarcoMarcoaldi/Vernice.js/assets/113010551/c8befd5f-c0d8-4c0d-99f1-a8735e590b3b)
+
 To ensure that the Vernice.js middleware remains active and starts automatically upon system reboot, it is necessary to configure a systemd unit. This is crucial to ensure the service is always available to handle webhooks sent by Ghost. To achieve this, we will create a configuration file in /lib/systemd/system/vernice.service containing the following code:
 
 ```systemd
@@ -75,7 +79,9 @@ WantedBy=multi-user.target
 
 Remember to adjust the paths based on the location of the vernice.js file. In the systemd unit example above, it is assumed that the script is running in the /root directory with root privileges.
 
-### Configuring Varnish for Ghost
+## Configuring Varnish for Ghost
+![image](https://github.com/MarcoMarcoaldi/Vernice.js/assets/113010551/e6adc4a2-14fd-4f92-833d-b072c4b2d59c)
+
 Regarding Varnish configuration, due to company policy, we do not delve into the specifics of the configuration and the related VCL. We use a specific and customized version extended with Inline C. However, the configuration can be applied simply by ensuring that the recv block in Varnish is capable of correctly handling the PURGE command by performing a selective BAN of the URL.
 
 Below is a brief snippet of the configuration (in VCL - Varnish Cache Language) where the requester's IP is checked (it must match either the machine's IP or the localhost IP) before proceeding with the BAN of the URL passed by the vernice.js middleware.
@@ -98,7 +104,7 @@ error 405 "Not allowed.";
  
 }
 ```
-### License
+## License
 This project is licensed under the AGPL 3.0 License https://www.gnu.org/licenses/agpl-3.0.en.html
 Please contribute, fork and expand it. U Are Welcome !
 
