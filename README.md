@@ -1,6 +1,9 @@
 # Vernice.js
 ## A Node.js Middleware for Purging Varnish Cache in GHOST CMS via Webhook
 
+![image](https://github.com/MarcoMarcoaldi/Vernice.js/assets/113010551/201b5358-8719-4df0-8c6f-34953a62ff9e)
+
+
 Vernice.js is designed as a middleware written in Node.js that acts as an intermediary between Ghost and Varnish. It operates independently of both systems, receiving webhook calls from Ghost, processing the received data, and interfacing with Varnish to perform selective cache purging.
 
 ### How It Works
