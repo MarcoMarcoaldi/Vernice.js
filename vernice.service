@@ -1,0 +1,13 @@
+[Unit]
+Description=Vernice.js systemd service for vernice.js Node Varnish Cache Purger
+After=network.target
+ 
+[Service]
+Type=simple
+WorkingDirectory=/root
+User=root
+ExecStart=/usr/bin/node /root/vernice.js
+Restart=always
+ 
+[Install]
+WantedBy=multi-user.target
