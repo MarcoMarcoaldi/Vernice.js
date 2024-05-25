@@ -15,10 +15,13 @@ When Ghost sends a webhook call following the publication, update, or deletion o
 
 
 ### Steps Involved:
-Receiving Webhooks: Ghost sends a webhook with a JSON payload after content changes.
-Extracting URLs: Vernice.js analyzes the JSON payload to obtain urlObject.pathname and urlObject.host. These details are crucial because Varnish cannot directly process a JSON payload.
-Formatting Purge Requests: Using the extracted information, Vernice.js formats the purge requests appropriately for Varnish.
-Sending PURGE Requests: Vernice.js sends HTTP PURGE requests to Varnish for the specified path and the homepage, allowing Varnish to selectively invalidate the cache only for the affected URLs.
+1. Receiving Webhooks: Ghost sends a webhook with a JSON payload after content changes.
+
+2. Extracting URLs: Vernice.js analyzes the JSON payload to obtain urlObject.pathname and urlObject.host. These details are crucial because Varnish cannot directly process a JSON payload.
+
+3. Formatting Purge Requests: Using the extracted information, Vernice.js formats the purge requests appropriately for Varnish.
+
+4. Sending PURGE Requests: Vernice.js sends HTTP PURGE requests to Varnish for the specified path and the homepage, allowing Varnish to selectively invalidate the cache only for the affected URLs.
 
 Example Process
 Once the necessary details are extracted, Vernice.js sends a PURGE HTTP request to Varnish for the specific path and the homepage. This enables Varnish to selectively invalidate the cache for the affected URLs, ensuring users always receive the most up-to-date content. Although the command sent is of type PURGE, Varnish can be configured to translate this command into a BAN, which is an effective method for selective cache cleaning.
@@ -33,6 +36,7 @@ This approach allows for an exceptionally high HIT RATIO, making the cache parti
 
 ### Requirements
 Node.js and express, axios, url, body-parser. Varnish Cache 3.0 or Higher. A Linux OS support systemd.
+
 
 ## Configuring Ghost to Use Web API Hooks
 ![image](https://github.com/MarcoMarcoaldi/Vernice.js/assets/113010551/875103a9-d14a-4bea-99b1-53109d4a2fc7)
@@ -55,6 +59,7 @@ In the Varnish Purge integration screen, click on Add webhook and fill in the we
 Repeat the process to add additional webhooks that cover all events of interest, such as the publication, update, and deletion of posts, pages, or other content.
 
 ![image](https://github.com/MarcoMarcoaldi/Vernice.js/assets/113010551/bd2b4abf-c09d-4fc4-867a-190c2ad090c7)
+
 
 ## Keeping the Service Active with a Systemd Unit
 ![image](https://github.com/MarcoMarcoaldi/Vernice.js/assets/113010551/c8befd5f-c0d8-4c0d-99f1-a8735e590b3b)
@@ -79,12 +84,16 @@ WantedBy=multi-user.target
 
 Remember to adjust the paths based on the location of the vernice.js file. In the systemd unit example above, it is assumed that the script is running in the /root directory with root privileges.
 
+
 ## Configuring Varnish for Ghost
 ![image](https://github.com/MarcoMarcoaldi/Vernice.js/assets/113010551/e6adc4a2-14fd-4f92-833d-b072c4b2d59c)
 
-Regarding Varnish configuration, due to company policy, we do not delve into the specifics of the configuration and the related VCL. We use a specific and customized version extended with Inline C. However, the configuration can be applied simply by ensuring that the recv block in Varnish is capable of correctly handling the PURGE command by performing a selective BAN of the URL.
+Regarding Varnish configuration, due to company policy, we do not delve into the specifics of the configuration and the related VCL. We use a specific and customized version extended with Inline C. However, the configuration can be applied simply by ensuring that the recv block in Varnish is capable of correctly handling the PURGE command by performing a selective BAN of the URL. In this example and the following VCL code, we use Varnish Cache configured to listen on the loopback interface 127.0.0.1 and TCP port 80.
+
+Please note that Varnish does not support HTTPS and SSL termination. Therefore, you need to set up a web server, such as NGINX, Caddy, or any other reverse proxy in front of Varnish to handle HTTPS and SSL termination.
 
 Below is a brief snippet of the configuration (in VCL - Varnish Cache Language) where the requester's IP is checked (it must match either the machine's IP or the localhost IP) before proceeding with the BAN of the URL passed by the vernice.js middleware.
+
 ```vcl
 if (req.http.x-forwarded-for) {
 set req.http.X-Forwarded-For = req.http.X-Forwarded-For + ", " + client.ip;
@@ -104,6 +113,7 @@ error 405 "Not allowed.";
  
 }
 ```
+
 ## License
 This project is licensed under the AGPL 3.0 License https://www.gnu.org/licenses/agpl-3.0.en.html
 Please contribute, fork and expand it. U Are Welcome !
