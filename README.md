@@ -57,15 +57,29 @@ Repeat the process to add additional webhooks that cover all events of interest,
 ### Keeping the Service Active with a Systemd Unit
 To ensure that the Vernice.js middleware remains active and starts automatically upon system reboot, it is necessary to configure a systemd unit. This is crucial to ensure the service is always available to handle webhooks sent by Ghost. To achieve this, we will create a configuration file in /lib/systemd/system/vernice.service containing the following code:
 
-![image](https://github.com/MarcoMarcoaldi/Vernice.js/assets/113010551/7463531d-f6ae-4f1d-be0d-c9c0d189050d)
+```systemd
+[Unit]
+Description=Vernice.js systemd service for vernice.js Node Varnish Cache Purger
+After=network.target
+ 
+[Service]
+Type=simple
+WorkingDirectory=/root
+User=root
+ExecStart=/usr/bin/node /root/vernice.js
+Restart=always
+ 
+[Install]
+WantedBy=multi-user.target
+```
 
 Remember to adjust the paths based on the location of the vernice.js file. In the systemd unit example above, it is assumed that the script is running in the /root directory with root privileges.
 
 ### Configuring Varnish for Ghost
 Regarding Varnish configuration, due to company policy, we do not delve into the specifics of the configuration and the related VCL. We use a specific and customized version extended with Inline C. However, the configuration can be applied simply by ensuring that the recv block in Varnish is capable of correctly handling the PURGE command by performing a selective BAN of the URL.
 
-Below is a brief snippet of the configuration where the requester's IP is checked (it must match either the machine's IP or the localhost IP) before proceeding with the BAN of the URL passed by the vernice.js middleware.
-
+Below is a brief snippet of the configuration (in VCL - Varnish Cache Language) where the requester's IP is checked (it must match either the machine's IP or the localhost IP) before proceeding with the BAN of the URL passed by the vernice.js middleware.
+```vcl
 if (req.http.x-forwarded-for) {
 set req.http.X-Forwarded-For = req.http.X-Forwarded-For + ", " + client.ip;
 } else {
@@ -83,8 +97,11 @@ error 405 "Not allowed.";
 }
  
 }
-
+```
 ### License
 This project is licensed under the AGPL 3.0 License https://www.gnu.org/licenses/agpl-3.0.en.html
+Please contribute, fork and expand it. U Are Welcome !
+
+For questions, write me at info@managedserver.it
 
 
